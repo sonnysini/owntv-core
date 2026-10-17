@@ -52,6 +52,8 @@ internal object RecordingNotifications {
     }
 
     private fun ensureChannel(context: Context, localized: Context) {
+        // Notification channels exist from API 26; Android 7.1 (Fire TV Stick 4K) has none to create.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
         val effectiveLocale = localized.resources.configuration.locales[0]?.toLanguageTag().orEmpty()
         val name = localized.getString(R.string.recording_notification_title)

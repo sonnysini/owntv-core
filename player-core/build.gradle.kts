@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 25
         consumerProguardFiles("consumer-rules.pro")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,6 +39,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // java.time and friends on API 25 (minSdk was 26).
+        isCoreLibraryDesugaringEnabled = true
     }
 
     // Same as :core — release only, sources included.
@@ -83,6 +85,7 @@ publishing {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     // The engine reads settings, playback preferences and DB entities, and reports into core's
     // hooks. The arrow points this way only: :core never sees :player-core.
     implementation(project(":core"))

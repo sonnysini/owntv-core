@@ -23,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 25
         consumerProguardFiles("consumer-rules.pro")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -45,6 +45,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // java.time and friends on API 25 (minSdk was 26).
+        isCoreLibraryDesugaringEnabled = true
     }
 
     // Only the release variant is published. Sources travel with it: an app developer stepping into
@@ -194,6 +196,7 @@ val verifyI18nLiterals = tasks.register<VerifyI18nLiterals>("verifyI18nLiterals"
 tasks.named("preBuild") { dependsOn(verifyI18nLiterals) }
 
 dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.core.ktx)
     implementation(libs.kotlinx.coroutines.android)
 
