@@ -13,6 +13,15 @@ import tv.own.owntv.core.database.entity.ChannelEntity
 import tv.own.owntv.core.database.entity.ContentHashProjection
 
 /** A channel plus its category name, for richer global-search results ("category · #number"). */
+/** Fork: the few columns the Live list needs to fold quality variants (FHD/HD/SD…) into one row. */
+data class ChannelVariantRow(
+    val id: Long,
+    val sourceId: Long,
+    val categoryId: Long?,
+    val name: String,
+    val sortOrder: Int,
+)
+
 data class ChannelSearchResult(
     @Embedded val channel: ChannelEntity,
     val categoryName: String?,
@@ -306,6 +315,10 @@ interface ChannelDao {
      *  channel-list fallback for a channel that has no category of its own. */
     @Query("SELECT * FROM channels WHERE sourceId IN (:sourceIds) ORDER BY sourceId ASC, sortOrder ASC, name ASC LIMIT :limit")
     suspend fun snapshotAll(sourceIds: List<Long>, limit: Int): List<ChannelEntity>
+
+    /** Fork: every channel of the profile's playlists, light — re-emits when a sync rewrites the table. */
+    @Query("SELECT id, sourceId, categoryId, name, sortOrder FROM channels WHERE sourceId IN (:sourceIds)")
+    fun observeVariantRows(sourceIds: List<Long>): Flow<List<ChannelVariantRow>>
 
     /** Bounded snapshot of the Catch-up rail in provider order — the in-player category sheet's pick. */
     @Query("SELECT * FROM channels WHERE sourceId IN (:sourceIds) AND catchup = 1 ORDER BY sourceId ASC, sortOrder ASC, name ASC LIMIT :limit")
